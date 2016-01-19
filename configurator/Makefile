@@ -30,7 +30,7 @@ endef
 
 define Package/ffol-configurator/install
 	$(INSTALL_DIR) $(1)/usr/lib//micron.d/
-	$(INSTALL_DATA) files/lib/gluon/cron/configurator $(1)/usr/lib/micron.d/configurator
+	$(INSTALL_DATA) files/usr/lib/micron.d/configurator $(1)/usr/lib/micron.d/configurator
 	$(INSTALL_DIR) $(1)/lib/ffol/configurator/
 	$(INSTALL_BIN) files/lib/ffol/configurator/configurator.sh $(1)/lib/ffol/configurator/
 	$(INSTALL_DIR) $(1)/etc/config/
