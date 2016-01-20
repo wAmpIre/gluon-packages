@@ -67,7 +67,7 @@ sync_hostname() {
 	api_return=$(wget -T $API_TIMEOUT -q -O - "http://$netmon_api/api_csv_configurator.php?section=get_hostname&authentificationmethod=$CRAWL_METHOD&nickname=$CRAWL_NICKNAME&password=$CRAWL_PASSWORD&router_auto_update_hash=$CRAWL_UPDATE_HASH&router_id=$CRAWL_ROUTER_ID")
 	ret=${api_return%%,*}
 	if [ "$ret" != "success" ]; then
-		err "Ther was an error fetching the hostname"
+		err "There was an error fetching the hostname"
 		exit 0
 	elif [ "$ret" = "success" ]; then
 		netmon_hostname=${api_return%,*}
@@ -94,6 +94,35 @@ sync_hostname() {
 		else
 			err "Hostname exceeds the maximum length of 255 characters"
 			exit 0
+		fi
+	fi
+}
+
+sync_coords () {
+	err "Syncing coordiantes"
+	api_return=$(wget -T $API_TIMEOUT -q -O - "http://$netmon_api/api_csv_configurator.php?section=get_coords&router_id=$CRAWL_ROUTER_ID")
+	ret=${api_return%%,*}
+	if [ "$ret" != "success" ]; then
+		err "There was an error fetching the hostname"
+		exit 0
+	fi
+	coords=${api_return/success,/}
+	if echo $coords | egrep -qo '^[+-]?[0-9]+\.[0-9]+,[+-]?[0-9]+\.[0-9]+'; then
+		GET_NETMON_COORDS=`uci -q get gluon-node-info.@location[0].get_netmon_coords`
+		if [ "x$GET_NETMON_COORDS" != "x0" ]; then
+			LATITUDE=`uci -q get gluon-node-info.@location[0].latitude`
+			LONGITUDE=`uci -q get gluon-node-info.@location[0].longitude`
+			SHARE_LOCATION=`uci -q get gluon-node-info.@location[0].share_location`
+			if [ "x$SHARE_LOCATION" == "x1" -o "x$LATITUDE" == "x" -o "x$LONGITUDE" == "x" ]; then
+				eval `echo $coords | awk -F, '{ print "lat="$1; print "long="$2; }'`
+				if [ "x$SHARE_LOCATION" != "1" -o "x$LATITUDE" != "x$lat" -o "x$LONGITUDE" != "x$long" ]; then
+					uci -q set gluon-node-info.@location[0].share_location=1
+					uci -q set gluon-node-info.@location[0].get_netmon_coords=1
+					uci -q set gluon-node-info.@location[0].latitude=$lat
+					uci -q set gluon-node-info.@location[0].longitude=$long
+					uci -q commit
+				fi
+			fi
 		fi
 	fi
 }
@@ -191,3 +220,6 @@ fi
 if [[ $SCRIPT_SYNC_HOSTNAME = "1" ]]; then
 	sync_hostname
 fi
+
+sync_coords
+
