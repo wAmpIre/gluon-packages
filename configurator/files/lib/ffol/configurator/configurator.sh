@@ -115,7 +115,7 @@ sync_coords () {
 			SHARE_LOCATION=`uci -q get gluon-node-info.@location[0].share_location`
 			if [ "x$SHARE_LOCATION" == "x1" -o "x$LATITUDE" == "x" -o "x$LONGITUDE" == "x" ]; then
 				eval `echo $coords | awk -F, '{ print "lat="$1; print "long="$2; }'`
-				if [ "x$SHARE_LOCATION" != "1" -o "x$LATITUDE" != "x$lat" -o "x$LONGITUDE" != "x$long" ]; then
+				if [ "x$SHARE_LOCATION" != "x1" -o "x$LATITUDE" != "x$lat" -o "x$LONGITUDE" != "x$long" ]; then
 					uci -q set gluon-node-info.@location[0].share_location=1
 					uci -q set gluon-node-info.@location[0].get_netmon_coords=1
 					uci -q set gluon-node-info.@location[0].latitude=$lat
