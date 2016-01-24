@@ -103,10 +103,14 @@ sync_coords () {
 	api_return=$(wget -T $API_TIMEOUT -q -O - "http://$netmon_api/api_csv_configurator.php?section=get_coords&router_id=$CRAWL_ROUTER_ID")
 	ret=${api_return%%,*}
 	if [ "$ret" != "success" ]; then
-		err "There was an error fetching the hostname"
-		exit 0
+		err "There was an error fetching the coordinates"
+		return 1
 	fi
 	coords=${api_return/success,/}
+	if echo $coords | grep -q '^0,0,\?$' ; then
+		err "Netmon has no coordinates"
+		return 0
+	fi
 	if echo $coords | egrep -qo '^[+-]?[0-9]+\.[0-9]+,[+-]?[0-9]+\.[0-9]+'; then
 		GET_NETMON_COORDS=`uci -q get gluon-node-info.@location[0].get_netmon_coords`
 		if [ "x$GET_NETMON_COORDS" != "x0" ]; then
