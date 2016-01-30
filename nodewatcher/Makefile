@@ -30,7 +30,7 @@ endef
 
 define Package/ffol-nodewatcher/install
 	$(INSTALL_DIR) $(1)/usr/lib/micron.d/
-	$(INSTALL_DATA) files/files/usr/lib/micron.d/nodewatcher $(1)/usr/lib/micron.d/nodewatcher
+	$(INSTALL_DATA) files/usr/lib/micron.d/nodewatcher $(1)/usr/lib/micron.d/nodewatcher
 	$(INSTALL_DIR) $(1)/lib/ffol/nodewatcher/
 	$(INSTALL_BIN) files/lib/ffol/nodewatcher/nodewatcher.sh $(1)/lib/ffol/nodewatcher/
 	$(INSTALL_DIR) $(1)/etc/config/
